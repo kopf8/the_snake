@@ -33,21 +33,25 @@ Turns = {
 
 
 class GameObject:
-    """Base class for all game objects
+    """Base class for all game objects.
+
     Attributes:
-        position (tuple): (x, y) position of the game object, by default it's the center of the game screen
-        body_color: one of the predefined RGB colors
-    Methods:
-        draw(): Draws the object on the game screen
-        draw_block(): Draws one square block of the object on the screen"""
+    position (tuple): (x, y) position of the game object,
+    by default it's the center of the game screen
+    body_color: one of the predefined RGB colors
+    """
+
     def __init__(self, body_color=None):
+        """Initialize game object."""
         self.position = ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
         self.body_color = body_color
 
     def draw(self, surface):
+        """Draw the object on game screen."""
         raise NotImplementedError
 
     def draw_block(self, positions, surface):
+        """Draw one square block of the object on the screen."""
         rect = pygame.Rect(
             (self.position[0], self.position[1]),
             (GRID_SIZE, GRID_SIZE)
@@ -58,41 +62,42 @@ class GameObject:
 
 class Apple(GameObject):
     """
-    Derived class for Apple game object
+    Derived class for Apple game object.
+
     Inherits from GameObject class
-    Methods:
-        randomize_position(): Randomizes the Apple object position on the screen
     """
+
     def __init__(self, body_color=APPLE_COLOR):
+        """Initialize Apple object."""
         super().__init__(body_color)
         self.randomize_position()
 
     def randomize_position(self):
+        """Randomize the Apple object position on screen."""
         self.position = (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE
         )
 
     def draw(self, surface):
+        """Draw the Apple object on game screen."""
         super().draw_block(self.position, screen)
 
 
 class Snake(GameObject):
     """
-    Derived class for Snake game object
+    Derived class for Snake game object.
+
     Inherits from GameObject class
     Attributes:
-        length: Length of the snake, =1 at the beginning of the game
-        positions (tuple): List of (X, y) positions of the Snake blocks
-        direction: Direction of Snake movement, one of the predefined directions
-        next_direction: Change of the Snake movement direction after the key is pressed by user
-    Methods:
-        update_direction(): Updates the direction of Snake movement
-        get_head_position(): Gets the head coordinates of the Snake
-        move(): Defines the movement of the Snake, it's behaviour after hitting the Apple and after hitting itself
-        reset(): Resets the Snake to the initial condition
+    length: Length of the snake, =1 at the beginning of the game
+    positions (tuple): List of (X, y) positions of the Snake blocks
+    direction: Direction of Snake movement, one of the predefined directions
+    next_direction: next movement direction after the key is pressed by user
     """
+
     def __init__(self, body_color=SNAKE_COLOR):
+        """Initialize Snake object."""
         super().__init__(body_color)
         self.length = 1
         self.positions = [self.position]
@@ -101,14 +106,20 @@ class Snake(GameObject):
         self.last = None
 
     def update_direction(self):
+        """Update the direction of Snake movement."""
         if self.next_direction:
             self.direction = self.next_direction
             self.next_direction = None
 
     def get_head_position(self):
+        """Get the head coordinates of the Snake."""
         return self.positions[0]
 
     def move(self):
+        """Define the movement logic of the Snake.
+
+        Define behaviour after hitting the Apple and after hitting itself.
+        """
         x, y = self.get_head_position()
         dx, dy = self.direction
 
@@ -129,6 +140,7 @@ class Snake(GameObject):
             self.last = None
 
     def draw(self, surface):
+        """Draw the Snake object on game screen."""
         for position in self.positions[:-1]:
             super().draw_block(self.position, screen)
 
@@ -144,6 +156,7 @@ class Snake(GameObject):
             pygame.draw.rect(surface, BOARD_BACKGROUND_COLOR, last_rect)
 
     def reset(self):
+        """Reset the Snake to the initial condition."""
         self.positions.clear()
         self.length = 1
         directions = [UP, DOWN, LEFT, RIGHT]
@@ -152,19 +165,19 @@ class Snake(GameObject):
 
 
 def handle_keys(game_object):
-    """Handles user input and changes object's movement direction"""
+    """Handle user input and changes object's movement direction."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             raise SystemExit
-        elif event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN:
             for turn in Turns:
                 if event.key == turn[0] and game_object.direction != turn[1]:
                     game_object.next_direction = Turns[turn]
 
 
 def main():
-    """Main function for game cycle"""
+    """Run game cycle."""
     pygame.init()
     snake = Snake()
     apple = Apple()
