@@ -64,12 +64,12 @@ class Apple(GameObject):
     Inherits from GameObject class
     """
 
-    def __init__(self, body_color=APPLE_COLOR, occupied_cells=[]):
+    def __init__(self, body_color=APPLE_COLOR):
         """Initialize Apple object."""
         super().__init__(body_color)
-        self.randomize_position(occupied_cells)
+        self.randomize_position([])
 
-    def randomize_position(self, occupied_cells):
+    def randomize_position(self, occupied_cells=None):
         """Randomize the Apple object position on screen."""
         while True:
             self.position = (
@@ -140,7 +140,6 @@ class Snake(GameObject):
         self.length = 1
         self.positions = [self.position]
         self.last = None
-        self.next_direction = None
         self.direction = choice([UP, DOWN, LEFT, RIGHT])
         screen.fill(BOARD_BACKGROUND_COLOR)
 
@@ -171,8 +170,6 @@ def main():
         clock.tick(SPEED)
         handle_keys(snake)
         snake.move()
-        if snake.next_direction:
-            snake.update_direction(snake.next_direction)
 
         if snake.positions[0] == apple.position:
             snake.length += 1
